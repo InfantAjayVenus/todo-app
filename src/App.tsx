@@ -1,5 +1,6 @@
-import { CssBaseline, ThemeOptions, ThemeProvider, Typography, createTheme } from '@mui/material';
+import { Container, CssBaseline, ThemeOptions, ThemeProvider, Typography, createTheme } from '@mui/material';
 import Helmet from 'react-helmet';
+import Home from './pages/Home';
 
 export const themeOptions: ThemeOptions = {
   palette: {
@@ -32,9 +33,17 @@ function App() {
       </Helmet>
       <ThemeProvider theme={lightTheme}>
         <CssBaseline />
-        <head>
-            <Typography>todo.</Typography>
-        </head>
+        <Container
+          sx={{
+            padding: '2rem 3rem'
+          }}
+        >
+          <header>
+            <Typography variant='h3' fontWeight={'700'} color='primary.main'>todo.</Typography>
+          </header>
+          <Home />
+        </Container>
+
       </ThemeProvider>
     </>
   );
