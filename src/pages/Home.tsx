@@ -148,6 +148,14 @@ export default function Home() {
                     </CardActions>
                 </Card>
             </main>
+            <aside>
+                <AddTaskForm 
+                    isFormVisible={isAddModalOpen}
+                    onCloseForm={() => {
+                        setIsAddModalOpen(false);
+                    }}
+                />
+            </aside >
         </>
     )
 }
