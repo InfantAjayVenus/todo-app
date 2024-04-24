@@ -13,6 +13,13 @@ export default function AddTaskForm({isFormVisible, onCloseForm}:AddTaskFormProp
     return (
         <>
             <Dialog
+                slotProps={{
+                    backdrop: {
+                        sx: {
+                            backdropFilter: 'blur(0.4rem)'
+                        }
+                    }
+                }}
                 TransitionComponent={Slide}
                 TransitionProps={{
                     direction: 'right',
