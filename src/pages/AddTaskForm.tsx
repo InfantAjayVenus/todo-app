@@ -9,17 +9,10 @@ interface AddTaskFormProps {
     onCloseForm: () => void
 }
 
-export default function AddTaskForm({isFormVisible, onCloseForm}:AddTaskFormProps) {
+export default function AddTaskForm({ isFormVisible, onCloseForm }: AddTaskFormProps) {
     return (
         <>
             <Dialog
-                slotProps={{
-                    backdrop: {
-                        sx: {
-                            backdropFilter: 'blur(0.4rem)'
-                        }
-                    }
-                }}
                 TransitionComponent={Slide}
                 TransitionProps={{
                     direction: 'right',
@@ -30,8 +23,20 @@ export default function AddTaskForm({isFormVisible, onCloseForm}:AddTaskFormProp
                 PaperComponent={Card}
                 PaperProps={{
                     sx: {
-                        borderRadius: '1rem !important',
-                        height: 'fit-content',
+                        marginTop: '2rem',
+                        height: '80vh',
+                        minWidth: '20rem',
+                        borderRadius: '1rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        padding: '1rem',
+                    },
+                }}
+                slotProps={{
+                    backdrop: {
+                        sx: {
+                            backdropFilter: 'blur(0.4rem)',
+                        }
                     }
                 }}
             >
@@ -74,7 +79,7 @@ export default function AddTaskForm({isFormVisible, onCloseForm}:AddTaskFormProp
                                     }
                                 }}
                             />
-                            <DatePicker label="Due Date"/>
+                            <DatePicker label="Due Date" />
                         </Stack>
                     </LocalizationProvider>
                 </DialogContent>
