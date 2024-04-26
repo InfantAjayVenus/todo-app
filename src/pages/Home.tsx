@@ -4,6 +4,7 @@ import 'dayjs/locale/en-gb';
 import { useState } from "react";
 import AddTaskForm from "./AddTaskForm";
 import Filters from "./Filters";
+import TaskDetails from "./TaskDetails";
 
 type Task = {
     title: string,
@@ -38,6 +39,7 @@ export default function Home() {
     const [tasksList, setTasksList] = useState<Task[]>(defaultTasks);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+    const [isDetailsViewActive, setIsDetailsViewActive] = useState(false);
 
     const getCompletedCount = () => tasksList.filter(({ isComplete }) => isComplete).length;
 
@@ -124,6 +126,9 @@ export default function Home() {
                                         disableGutters
                                         disableRipple
                                         disableTouchRipple
+                                        onClick={() => {
+                                            setIsDetailsViewActive(true);
+                                        }}
                                     >
                                         <ListItemText
                                             sx={{
@@ -160,7 +165,12 @@ export default function Home() {
                         setIsAddModalOpen(false);
                     }}
                 />
-
+                <TaskDetails
+                    isDetailsViewActive={isDetailsViewActive}
+                    onClose={() => {
+                        setIsDetailsViewActive(false);
+                    }}
+                />
             </main>
             <IconButton
                 size="large"
