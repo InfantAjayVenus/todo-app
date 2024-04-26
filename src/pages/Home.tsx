@@ -1,8 +1,9 @@
-import { CheckCircleOutline, RadioButtonUnchecked, Star, StarOutline } from "@mui/icons-material";
-import { Button, Card, CardActions, CardContent, CardHeader, Checkbox, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
+import { CheckCircleOutline, Close, Menu, RadioButtonUnchecked, Star, StarOutline } from "@mui/icons-material";
+import { Button, Card, CardActions, CardContent, CardHeader, Checkbox, Dialog, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import 'dayjs/locale/en-gb';
 import { useState } from "react";
 import AddTaskForm from "./AddTaskForm";
+import Filters from "./Filters";
 
 type Task = {
     title: string,
@@ -36,6 +37,7 @@ const defaultTasks = [
 export default function Home() {
     const [tasksList, setTasksList] = useState<Task[]>(defaultTasks);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
     const getCompletedCount = () => tasksList.filter(({ isComplete }) => isComplete).length;
 
@@ -147,15 +149,64 @@ export default function Home() {
                         >Add Task</Button>
                     </CardActions>
                 </Card>
-            </main>
-            <aside>
-                <AddTaskForm 
+                <AddTaskForm
                     isFormVisible={isAddModalOpen}
                     onCloseForm={() => {
                         setIsAddModalOpen(false);
                     }}
                 />
-            </aside >
+
+            </main>
+            <IconButton
+                size="large"
+                sx={{
+                    position: 'fixed',
+                    zIndex: 'modal',
+                    top: '1.8rem',
+                    right: '3rem',
+                    color: 'primary.main'
+                }}
+                onClick={() => {
+                    setIsFilterModalOpen(true);
+                }}
+            ><Menu /></IconButton>
+            <Dialog
+                open={isFilterModalOpen}
+                onClose={() => {
+                    setIsFilterModalOpen(false);
+                }}
+                PaperComponent={Card}
+                PaperProps={{
+                    sx: {
+                        borderRadius: '1rem !important',
+                        height: 'fit-content',
+                        padding: '1rem',
+                        marginTop: '1rem',
+                    }
+                }}
+                slotProps={{
+                    backdrop: {
+                        sx: {
+                            backdropFilter: 'blur(0.4rem)'
+                        }
+                    }
+                }}
+            >
+                <IconButton
+                    size="large"
+                    sx={{
+                        position: 'fixed',
+                        zIndex: 'modal',
+                        top: '1.8rem',
+                        right: '3rem',
+                        color: 'primary.main',
+                    }}
+                    onClick={() => {
+                        setIsFilterModalOpen(false);
+                    }}
+                ><Close /></IconButton>
+                <Filters />
+            </Dialog>
         </>
     )
 }
