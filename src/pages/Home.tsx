@@ -88,9 +88,14 @@ export default function Home() {
                                     sx={{
                                         marginBottom: '0.5rem',
                                         borderRadius: '0.5rem',
-                                        backgroundColor: 'text.disabled',
+                                        border: taskItem.isComplete ? 'none' : '1px solid',
+                                        borderColor: 'text.secondary',
                                         color: taskItem.isComplete ? 'text.secondary' : 'text.primary',
                                         transition: 'all 0.5s',
+
+                                        '&:hover': {
+                                            backgroundColor: taskItem.isComplete ? 'transparent' : 'text.primary',
+                                        }
                                     }}
                                     secondaryAction={
                                         <Checkbox
@@ -115,14 +120,14 @@ export default function Home() {
                                     <ListItemButton
                                         sx={{
                                             padding: '0 !important',
-                                            '&:hover': {
-                                                backgroundColor: 'text.disabled'
-                                            },
                                         }}
                                         disableGutters
+                                        disableRipple
+                                        disableTouchRipple
                                     >
                                         <ListItemText
                                             sx={{
+                                                color: 'text.secondary',
                                                 textOverflow: 'ellipsis',
                                                 textDecoration: taskItem.isComplete ? 'line-through' : 'none'
                                             }}
