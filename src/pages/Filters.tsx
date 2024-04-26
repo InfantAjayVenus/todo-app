@@ -1,7 +1,18 @@
 import { Add, DateRange, Folder, Inbox, Star, Today } from "@mui/icons-material";
-import { IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Typography } from "@mui/material";
+import { Grow, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, TextField, Typography } from "@mui/material";
+import { useState } from "react";
 
 export default function Filters() {
+    const [projectsList, setProjectsList] = useState(["Default"]);
+    const [isAddProjectActive, setIsAddProjectActive] = useState(false);
+    const [newProjectName, setNewProjectName] = useState('');
+    const onAddProject = () => {
+        if(newProjectName.length > 0) {
+            setProjectsList([newProjectName, ...projectsList]);
+            setNewProjectName('');
+        }
+        setIsAddProjectActive(false);
+    }
     return (
         <aside
             style={{
@@ -97,29 +108,62 @@ export default function Filters() {
             <section>
                 <Stack direction="row" alignItems="center" justifyContent={'space-between'}>
                     <Typography variant="subtitle1" color={'primary'} fontWeight={'600'} padding={'1rem'}>Projects</Typography>
-                    <IconButton><Add /></IconButton>
+                    <IconButton onClick={() => {
+                        setIsAddProjectActive(true);
+                    }}><Add /></IconButton>
                 </Stack>
                 <List>
-                    <ListItem>
-                        <ListItemButton
-                            sx={{
-                                alignItems: 'center',
-                                borderRadius: '0.5rem',
-                                '&:hover': {
-                                    background: 'transparent',
-                                }
-                            }}
-                        >
-                            <ListItemIcon color="text.secondary"><Folder /></ListItemIcon>
-                            <ListItemText
-                                primary={"Default"}
-                                primaryTypographyProps={{
-                                    fontWeight: '600',
-                                    color: 'text.secondary',
+                    <Grow
+                        in={isAddProjectActive}
+                        mountOnEnter
+                        unmountOnExit
+                    >
+                        <ListItem>
+                            <form
+                                onBlur={onAddProject}
+                                style={{
+                                    width: '100%',
                                 }}
-                            />
-                        </ListItemButton>
-                    </ListItem>
+                            >
+                                <TextField
+                                    autoFocus
+                                    variant="outlined"
+                                    sx={{
+                                        borderRadius: '2rem',
+                                        width: '100%',
+                                    }}
+                                    value={newProjectName}
+                                    onChange={(event) => {
+                                        setNewProjectName(event.target.value);
+                                    }}
+                                    onBlur={onAddProject}
+                                />
+                            </form>
+                        </ListItem>
+                    </Grow>
+                    {projectsList.map((projectName, index) => (
+                        <ListItem>
+                            <ListItemButton
+                                key={index}
+                                sx={{
+                                    alignItems: 'center',
+                                    borderRadius: '0.5rem',
+                                    '&:hover': {
+                                        background: 'transparent',
+                                    }
+                                }}
+                            >
+                                <ListItemIcon color="text.secondary"><Folder /></ListItemIcon>
+                                <ListItemText
+                                    primary={projectName}
+                                    primaryTypographyProps={{
+                                        fontWeight: '600',
+                                        color: 'text.secondary',
+                                    }}
+                                />
+                            </ListItemButton>
+                        </ListItem>
+                    ))}
                 </List>
             </section>
         </aside>
