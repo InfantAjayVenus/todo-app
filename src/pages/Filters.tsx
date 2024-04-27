@@ -7,12 +7,13 @@ export default function Filters() {
     const [isAddProjectActive, setIsAddProjectActive] = useState(false);
     const [newProjectName, setNewProjectName] = useState('');
     const onAddProject = () => {
+        setIsAddProjectActive(false);
         if(newProjectName.length > 0) {
             setProjectsList([newProjectName, ...projectsList]);
             setNewProjectName('');
         }
-        setIsAddProjectActive(false);
     }
+    
     return (
         <aside
             style={{
@@ -121,6 +122,11 @@ export default function Filters() {
                         <ListItem>
                             <form
                                 onBlur={onAddProject}
+                                onSubmit={(event) => {
+                                    event.preventDefault();
+                                    event.stopPropagation();
+                                    onAddProject();
+                                }}
                                 style={{
                                     width: '100%',
                                 }}
