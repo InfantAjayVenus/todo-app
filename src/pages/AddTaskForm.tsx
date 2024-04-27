@@ -25,7 +25,7 @@ export default function AddTaskForm({ isFormVisible, onCloseForm }: AddTaskFormP
                     sx: {
                         marginTop: '2rem',
                         height: '80vh',
-                        minWidth: '20rem',
+                        minWidth: ['20rem', '30rem', '40rem'],
                         borderRadius: '1rem',
                         display: 'flex',
                         flexDirection: 'column',

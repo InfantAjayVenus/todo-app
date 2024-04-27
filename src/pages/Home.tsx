@@ -1,5 +1,5 @@
 import { CheckCircleOutline, Close, Menu, RadioButtonUnchecked, Star, StarOutline } from "@mui/icons-material";
-import { Button, Card, CardActions, CardContent, CardHeader, Checkbox, Dialog, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
+import { Button, Card, CardActions, CardContent, CardHeader, Checkbox, Dialog, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Typography } from "@mui/material";
 import 'dayjs/locale/en-gb';
 import { useState } from "react";
 import AddTaskForm from "./AddTaskForm";
@@ -53,112 +53,128 @@ export default function Home() {
     return (
         <>
             <main>
-                <Card
-                    sx={{
-                        marginTop: '2rem',
-                        height: '80vh',
-                        borderRadius: '1rem',
-                        display: 'flex',
-                        flexDirection: 'column',
-                    }}
-                    raised
-                >
-                    <CardHeader
-                        title={
-                            <Typography variant='subtitle1' fontWeight={600}>
-                                Tasks
-                            </Typography>
-                        }
-                        subheader={
-                            <Typography>{getCompletedCount()}/{tasksList.length}</Typography>
-                        }
-                    />
-                    <CardContent
+                <Stack direction={'row'} spacing={[0,4]}>
+                    <Card
                         sx={{
-                            padding: 0,
-                            flex: 1
+                            marginTop: '2rem',
+                            height: '80vh',
+                            borderRadius: '1rem',
+                            display: ['none', 'flex'],
+                            flexDirection: 'column',
+                            padding: '1rem',
                         }}
+                        raised
                     >
-                        <List
+                        <Filters />
+                    </Card>
+                    <Card
+                        sx={{
+                            flex: '1',
+                            marginTop: '2rem',
+                            height: '80vh',
+                            borderRadius: '1rem',
+                            display: 'flex',
+                            flexDirection: 'column',
+                        }}
+                        raised
+                    >
+                        <CardHeader
+                            title={
+                                <Typography variant='subtitle1' fontWeight={600}>
+                                    Tasks
+                                </Typography>
+                            }
+                            subheader={
+                                <Typography>{getCompletedCount()}/{tasksList.length}</Typography>
+                            }
+                        />
+                        <CardContent
                             sx={{
-                                padding: '0 1rem'
+                                padding: 0,
+                                flex: 1
                             }}
                         >
-                            {tasksList.map((taskItem, index) => (
-                                <ListItem
-                                    key={index}
-                                    sx={{
-                                        marginBottom: '0.5rem',
-                                        borderRadius: '0.5rem',
-                                        border: taskItem.isComplete ? 'none' : '1px solid',
-                                        borderColor: 'text.secondary',
-                                        color: taskItem.isComplete ? 'text.secondary' : 'text.primary',
-                                        transition: 'all 0.5s',
-
-                                        '&:hover': {
-                                            backgroundColor: taskItem.isComplete ? 'transparent' : 'text.primary',
-                                        }
-                                    }}
-                                    secondaryAction={
-                                        <Checkbox
-                                            edge="end"
-                                            icon={<StarOutline />}
-                                            checkedIcon={<Star />}
-                                            onChange={() => {
-                                            }}
-                                        />
-                                    }
-                                    disablePadding
-                                >
-                                    <ListItemIcon sx={{ minWidth: 'fit-content' }}>
-                                        <Checkbox
-                                            icon={<RadioButtonUnchecked />}
-                                            checkedIcon={<CheckCircleOutline />}
-                                            onClick={() => {
-                                                onToggleComplete(index);
-                                            }}
-                                        />
-                                    </ListItemIcon>
-                                    <ListItemButton
+                            <List
+                                sx={{
+                                    padding: '0 1rem'
+                                }}
+                            >
+                                {tasksList.map((taskItem, index) => (
+                                    <ListItem
+                                        key={index}
                                         sx={{
-                                            padding: '0 !important',
+                                            marginBottom: '0.5rem',
+                                            borderRadius: '0.5rem',
+                                            border: taskItem.isComplete ? 'none' : '1px solid',
+                                            borderColor: 'text.secondary',
+                                            color: taskItem.isComplete ? 'text.secondary' : 'text.primary',
+                                            transition: 'all 0.5s',
+
+                                            '&:hover': {
+                                                backgroundColor: taskItem.isComplete ? 'transparent' : 'text.primary',
+                                            }
                                         }}
-                                        disableGutters
-                                        disableRipple
-                                        disableTouchRipple
-                                        onClick={() => {
-                                            setIsDetailsViewActive(true);
-                                        }}
+                                        secondaryAction={
+                                            <Checkbox
+                                                edge="end"
+                                                icon={<StarOutline />}
+                                                checkedIcon={<Star />}
+                                                onChange={() => {
+                                                }}
+                                            />
+                                        }
+                                        disablePadding
                                     >
-                                        <ListItemText
+                                        <ListItemIcon sx={{ minWidth: 'fit-content' }}>
+                                            <Checkbox
+                                                icon={<RadioButtonUnchecked />}
+                                                checkedIcon={<CheckCircleOutline />}
+                                                onClick={() => {
+                                                    onToggleComplete(index);
+                                                }}
+                                            />
+                                        </ListItemIcon>
+                                        <ListItemButton
                                             sx={{
-                                                color: 'text.secondary',
-                                                textOverflow: 'ellipsis',
-                                                textDecoration: taskItem.isComplete ? 'line-through' : 'none'
+                                                padding: '0 !important',
                                             }}
-                                        >{taskItem.title}</ListItemText>
-                                    </ListItemButton>
-                                </ListItem>
-                            ))}
-                        </List>
-                    </CardContent>
-                    <CardActions
-                        sx={{
-                            padding: '1rem',
-                            justifyContent: 'end',
-                        }}
-                    >
-                        <Button
-                            variant="contained"
+                                            disableGutters
+                                            disableRipple
+                                            disableTouchRipple
+                                            onClick={() => {
+                                                setIsDetailsViewActive(true);
+                                            }}
+                                        >
+                                            <ListItemText
+                                                sx={{
+                                                    color: 'text.secondary',
+                                                    textOverflow: 'ellipsis',
+                                                    textDecoration: taskItem.isComplete ? 'line-through' : 'none'
+                                                }}
+                                            >{taskItem.title}</ListItemText>
+                                        </ListItemButton>
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </CardContent>
+                        <CardActions
                             sx={{
-                                borderRadius: '2rem',
+                                padding: '1rem',
+                                justifyContent: 'end',
                             }}
-                            onClick={() => {
-                                setIsAddModalOpen(true);
-                            }}
-                        >Add Task</Button>
-                    </CardActions>
-                </Card>
+                        >
+                            <Button
+                                variant="contained"
+                                sx={{
+                                    borderRadius: '2rem',
+                                }}
+                                onClick={() => {
+                                    setIsAddModalOpen(true);
+                                }}
+                            >Add Task</Button>
+                        </CardActions>
+                    </Card>
+                </Stack>
                 <AddTaskForm
                     isFormVisible={isAddModalOpen}
                     onCloseForm={() => {
@@ -179,7 +195,8 @@ export default function Home() {
                     zIndex: 'modal',
                     top: '1.8rem',
                     right: '3rem',
-                    color: 'primary.main'
+                    color: 'primary.main',
+                    display: ["auto", "none"],
                 }}
                 onClick={() => {
                     setIsFilterModalOpen(true);
