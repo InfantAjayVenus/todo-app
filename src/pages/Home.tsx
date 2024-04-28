@@ -3,7 +3,7 @@ import { Button, Card, CardActions, CardContent, CardHeader, Checkbox, Dialog, I
 import 'dayjs/locale/en-gb';
 import { useState } from "react";
 import AddTaskForm from "./AddTaskForm";
-import Filters from "./Filters";
+import Sections from "./Sections";
 import TaskDetails from "./TaskDetails";
 
 type Task = {
@@ -65,7 +65,7 @@ export default function Home() {
                         }}
                         raised
                     >
-                        <Filters />
+                        <Sections />
                     </Card>
                     <Card
                         sx={{
@@ -237,7 +237,7 @@ export default function Home() {
                         setIsFilterModalOpen(false);
                     }}
                 ><Close /></IconButton>
-                <Filters />
+                <Sections />
             </Dialog>
         </>
     )

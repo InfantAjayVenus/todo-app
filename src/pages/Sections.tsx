@@ -2,7 +2,7 @@ import { Add, DateRange, Folder, Inbox, Star, Today } from "@mui/icons-material"
 import { Grow, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 
-export default function Filters() {
+export default function Sections() {
     const [projectsList, setProjectsList] = useState(["Default"]);
     const [isAddProjectActive, setIsAddProjectActive] = useState(false);
     const [newProjectName, setNewProjectName] = useState('');
