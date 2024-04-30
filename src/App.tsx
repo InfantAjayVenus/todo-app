@@ -1,8 +1,10 @@
-import { Container, CssBaseline, ThemeOptions, ThemeProvider, Typography, createTheme } from '@mui/material';
+import { Container, CssBaseline, ThemeProvider, Typography, createTheme } from '@mui/material';
 import Helmet from 'react-helmet';
 import Home from './pages/Home';
+import { useState } from 'react';
 
-export const themeOptions: ThemeOptions = {
+
+const lightTheme = createTheme({
   palette: {
     mode: 'light',
     primary: {
@@ -21,17 +23,35 @@ export const themeOptions: ThemeOptions = {
       disabled: 'rgb(196, 205, 209)',
     },
   },
-};
+});
 
-const lightTheme = createTheme(themeOptions);
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#815ef7',
+    },
+    background: {
+      default: '#121215',
+      paper: '#1d1a28',
+    },
+    text: {
+      primary: '#cdb6fd',
+      secondary: '#929098',
+      disabled: '#717172',
+    }
+  }
+})
 
 function App() {
+  const [isThemeLight, _] = useState(true);
+
   return (
     <>
       <Helmet>
         <title>todo.</title>
       </Helmet>
-      <ThemeProvider theme={lightTheme}>
+      <ThemeProvider theme={isThemeLight ? lightTheme : darkTheme}>
         <CssBaseline />
         <Container
           sx={{
