@@ -6,7 +6,8 @@ import AddTaskForm from "./AddTaskForm";
 import Sections from "./Sections";
 import TaskDetails from "./TaskDetails";
 
-type Task = {
+export type Task = {
+    id: string,
     title: string,
     description?: string,
     isComplete: boolean,
@@ -16,20 +17,23 @@ type Task = {
 
 const defaultTasks = [
     {
+        id: '1',
         title: "A Test Task",
         description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Odit quasi neque, iste laborum alias illo repellat temporibus excepturi et quidem.",
         isComplete: false,
         isFavourite: false,
     },
     {
+        id: '2',
         title: "Another Test Task",
         description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Odit quasi neque, iste laborum alias illo repellat temporibus excepturi et quidem.",
         isComplete: false,
         isFavourite: true,
     },
     {
+        id: '3',
         title: "A Test Task",
-        isComplete: false,
+        isComplete: true,
         isFavourite: false,
         dueDate: new Date(),
     }
@@ -40,6 +44,7 @@ export default function Home() {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
     const [isDetailsViewActive, setIsDetailsViewActive] = useState(false);
+    const [activeTaskId, setActiveTaskId] = useState<string|null>(null);
 
     const getCompletedCount = () => tasksList.filter(({ isComplete }) => isComplete).length;
 
@@ -49,6 +54,15 @@ export default function Home() {
         tasksList[updateIndex] = updatedObject;
         setTasksList([...tasksList]);
     }
+
+    const onToggleFavourite = (updateIndex: number) => {
+        const updatedObject = { ...tasksList[updateIndex] };
+        updatedObject.isFavourite = !updatedObject.isFavourite;
+        tasksList[updateIndex] = updatedObject;
+        setTasksList([...tasksList]);
+    }
+
+    const activeTask = tasksList.find(({id}) => id === activeTaskId);
 
     return (
         <>
@@ -119,7 +133,9 @@ export default function Home() {
                                                 edge="end"
                                                 icon={<StarOutline />}
                                                 checkedIcon={<Star />}
+                                                checked={taskItem.isFavourite}
                                                 onChange={() => {
+                                                    onToggleFavourite(index);
                                                 }}
                                             />
                                         }
@@ -129,6 +145,7 @@ export default function Home() {
                                             <Checkbox
                                                 icon={<RadioButtonUnchecked />}
                                                 checkedIcon={<CheckCircleOutline />}
+                                                checked={taskItem.isComplete}
                                                 onClick={() => {
                                                     onToggleComplete(index);
                                                 }}
@@ -142,6 +159,7 @@ export default function Home() {
                                             disableRipple
                                             disableTouchRipple
                                             onClick={() => {
+                                                setActiveTaskId(taskItem.id);
                                                 setIsDetailsViewActive(true);
                                             }}
                                         >
@@ -181,12 +199,13 @@ export default function Home() {
                         setIsAddModalOpen(false);
                     }}
                 />
-                <TaskDetails
+                {activeTask && <TaskDetails
+                    activeTask={activeTask}
                     isDetailsViewActive={isDetailsViewActive}
                     onClose={() => {
                         setIsDetailsViewActive(false);
                     }}
-                />
+                />}
             </main>
             <IconButton
                 size="large"
