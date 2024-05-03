@@ -1,15 +1,19 @@
 import { ArrowBackIos, Edit, Folder, StarOutlineRounded, StarRounded } from "@mui/icons-material";
-import { Card, CardActions, CardContent, CardHeader, Checkbox, Dialog, IconButton, Slide, SlideProps, Stack, Typography } from "@mui/material";
-import AddTaskForm from "./AddTaskForm";
+import { Card, CardActions, CardContent, CardHeader, Dialog, IconButton, Slide, SlideProps, Stack, Typography } from "@mui/material";
+import dayjs from "dayjs";
 import { useState } from "react";
+import AddTaskForm from "./AddTaskForm";
+import { Task } from "./Home";
 
 interface TaskDetailsProps {
+    activeTask: Task,
     isDetailsViewActive: boolean,
     onClose: () => void,
 }
 
-export default function TaskDetails({ isDetailsViewActive, onClose }: TaskDetailsProps) {
+export default function TaskDetails({ activeTask, isDetailsViewActive, onClose }: TaskDetailsProps) {
     const [isEditActive, setIsEditActive] = useState(false);
+    const dueDate = dayjs(activeTask.dueDate).format('DD/MM/YY');
     return (
         <>
         <Dialog
@@ -30,6 +34,7 @@ export default function TaskDetails({ isDetailsViewActive, onClose }: TaskDetail
                     display: 'flex',
                     flexDirection: 'column',
                     padding: '1rem',
+                    minWidth: '25rem',
                 },
             }}
             slotProps={{
@@ -46,7 +51,7 @@ export default function TaskDetails({ isDetailsViewActive, onClose }: TaskDetail
                     <Typography variant='subtitle1' fontSize={'1.7rem'} alignItems={'center'} color={'text.secondary'}><Folder /> Default</Typography>
                 }
                 subheader={
-                    <Typography variant="body1" color={'primary.main'} fontWeight={'600'}>30/12/24</Typography>
+                    <Typography variant="body1" color={'primary.main'} fontWeight={'600'}>{activeTask.dueDate ? dueDate : 'No Due Set'}</Typography>
                 }
             />
             <CardContent
@@ -57,22 +62,20 @@ export default function TaskDetails({ isDetailsViewActive, onClose }: TaskDetail
                 <Stack
                     direction={'row'}
                     alignItems={'center'}
+                    justifyContent={'space-between'}
                     sx={{
                         borderBottom: '0.25rem solid',
                         borderColor: 'primary.main',
                         marginBottom: '1rem',
                     }}
                 >
-                    <Typography variant="h4">This is a sample title of a task</Typography>
-                    <Checkbox
-                        size="large"
-                        checked
-                        icon={<StarOutlineRounded />}
-                        checkedIcon={<StarRounded />}
-                    />
+                    <Typography variant="h4">{activeTask.title}</Typography>
+                    <Typography color="primary.main">
+                    {activeTask.isFavourite ? <StarRounded /> : <StarOutlineRounded />}
+                    </Typography>
                 </Stack>
                 <Typography variant="body1">
-                    Lorem ipsum dolor sit amet consectetur, adipisicing elit. Incidunt sunt ipsa eos, tenetur nulla minima error sit quas a neque voluptate, alias atque? Vel inventore delectus, magni expedita voluptate dolor!
+                    {activeTask.description}
                 </Typography>
             </CardContent>
             <CardActions>
