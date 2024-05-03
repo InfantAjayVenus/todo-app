@@ -1,8 +1,8 @@
-import { CheckCircleOutline, Close, Menu, RadioButtonUnchecked, Star, StarOutline } from "@mui/icons-material";
+import { CheckCircleOutline, Close, Menu, RadioButtonUnchecked, StarOutlineRounded, StarRounded } from "@mui/icons-material";
 import { Button, Card, CardActions, CardContent, CardHeader, Checkbox, Dialog, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Typography } from "@mui/material";
-import { useState } from "react";
-import {v4 as uuid} from 'uuid';
 import 'dayjs/locale/en-gb';
+import { useState } from "react";
+import { v4 as uuid } from 'uuid';
 
 
 import AddTaskForm from "./AddTaskForm";
@@ -156,8 +156,8 @@ export default function Home() {
                                         secondaryAction={
                                             <Checkbox
                                                 edge="end"
-                                                icon={<StarOutline />}
-                                                checkedIcon={<Star />}
+                                                icon={<StarOutlineRounded />}
+                                                checkedIcon={<StarRounded />}
                                                 checked={taskItem.isFavourite}
                                                 onChange={() => {
                                                     onToggleFavourite(index);
