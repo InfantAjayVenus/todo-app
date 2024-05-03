@@ -18,6 +18,12 @@ export default function AddTaskForm({ isFormVisible, onSave, onCloseForm }: AddT
     const [description, setDescription] = useState('');
     const [dueDate, setDueDate] = useState<Date|undefined>();
 
+    const resetStates = () => {
+        setTitle('');
+        setDescription('');
+        setDueDate(undefined);
+    }
+
     const isSubmitDisabled = title.length === 0 ;
 
     return (
@@ -116,6 +122,7 @@ export default function AddTaskForm({ isFormVisible, onSave, onCloseForm }: AddT
                                     dueDate
                                 });
                                 onCloseForm();
+                                resetStates();
                             }}
                         >Save</Button>
                     </Stack>
