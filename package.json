@@ -19,12 +19,14 @@
     "dayjs": "^1.11.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-helmet": "^6.1.0"
+    "react-helmet": "^6.1.0",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.74",
     "@types/react-dom": "^18.2.24",
     "@types/react-helmet": "^6.1.11",
+    "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^7.5.0",
     "@typescript-eslint/parser": "^7.5.0",
     "@vitejs/plugin-react": "^4.2.1",

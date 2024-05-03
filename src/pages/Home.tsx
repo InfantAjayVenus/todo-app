@@ -1,7 +1,10 @@
 import { CheckCircleOutline, Close, Menu, RadioButtonUnchecked, Star, StarOutline } from "@mui/icons-material";
 import { Button, Card, CardActions, CardContent, CardHeader, Checkbox, Dialog, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Typography } from "@mui/material";
-import 'dayjs/locale/en-gb';
 import { useState } from "react";
+import {v4 as uuid} from 'uuid';
+import 'dayjs/locale/en-gb';
+
+
 import AddTaskForm from "./AddTaskForm";
 import Sections from "./Sections";
 import TaskDetails from "./TaskDetails";
@@ -48,6 +51,28 @@ export default function Home() {
 
     const getCompletedCount = () => tasksList.filter(({ isComplete }) => isComplete).length;
 
+    const onAddTask = (inputs: Partial<Task>) => {
+        const {
+            id=uuid(),
+            title= '',
+            description='',
+            isComplete=false,
+            isFavourite=false,
+            dueDate=undefined
+        } = inputs;
+
+        setTasksList([
+            ...tasksList,
+            {
+                id,
+                title,
+                description,
+                isComplete,
+                isFavourite,
+                dueDate
+            } as Task
+        ]);
+    }
     const onToggleComplete = (updateIndex: number) => {
         const updatedObject = { ...tasksList[updateIndex] };
         updatedObject.isComplete = !updatedObject.isComplete;
@@ -194,6 +219,7 @@ export default function Home() {
                     </Card>
                 </Stack>
                 <AddTaskForm
+                    onSave={onAddTask}
                     isFormVisible={isAddModalOpen}
                     onCloseForm={() => {
                         setIsAddModalOpen(false);
