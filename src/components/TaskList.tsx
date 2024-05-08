@@ -3,17 +3,33 @@ import { Checkbox, List, ListItem, ListItemButton, ListItemIcon, ListItemText } 
 import { Task } from "../pages/Home";
 import { useState } from "react";
 import TaskDetails from "../pages/TaskDetails";
+import AddTaskForm from "../pages/AddTaskForm";
 
 interface TaskListProps {
     tasksList: Task[],
+    onUpdateList: (updatedList: Task[]) => void,
     onToggleComplete: (updateIndex: number) => void,
     onToggleFavourite: (updateIndex: number) => void,
 }
 
-export default function TaskList({ tasksList, onToggleComplete, onToggleFavourite }: TaskListProps) {
+export default function TaskList({ tasksList, onUpdateList, onToggleComplete, onToggleFavourite }: TaskListProps) {
     const [isDetailsViewActive, setIsDetailsViewActive] = useState(false);
     const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
+    const [isEditActive, setIsEditActive] = useState(false);
     const activeTask = tasksList.find(({ id }) => id === activeTaskId);
+
+    const updateTask = (updatedTaskId: string, updatedTaskData: Partial<Task>) => {
+        const updatedTaskIndex = tasksList.findIndex(({id}) => id === updatedTaskId);
+        if(updatedTaskIndex) throw("Task ID does not exist!");
+
+        const updatedTaskObject: Task = {
+            ...tasksList[updatedTaskIndex],
+            ...updatedTaskData
+        };
+
+        tasksList[updatedTaskIndex] = updatedTaskObject;
+        onUpdateList([...tasksList]);
+    }
 
     return (
         <>
@@ -85,14 +101,24 @@ export default function TaskList({ tasksList, onToggleComplete, onToggleFavourit
             </List>
             {activeTask && <TaskDetails
                 activeTask={activeTask}
-                isDetailsViewActive={isDetailsViewActive}
+                isDetailsViewActive={isDetailsViewActive && !isEditActive}
                 onEdit={() => {
-                    // setIsAddModalOpen(true);
+                    setIsEditActive(true);
                 }}
                 onClose={() => {
                     setIsDetailsViewActive(false);
                 }}
             />}
+            <AddTaskForm 
+                isFormVisible={isEditActive}
+                defaultTask={activeTask}
+                onCloseForm={() => {
+                    setIsEditActive(false);
+                }}
+                onSave={(updatedTaskData) => {
+                    activeTask && updateTask(activeTask?.id, updatedTaskData);
+                }}
+            />
         </>
     )
 }

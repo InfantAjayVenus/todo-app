@@ -132,6 +132,9 @@ export default function Home() {
                         >
                             <TaskList 
                                 tasksList={tasksList}
+                                onUpdateList={(updatedTaskList) => {
+                                    setTasksList([...updatedTaskList]);
+                                }}
                                 onToggleComplete={onToggleComplete}
                                 onToggleFavourite={onToggleFavourite}
                             />

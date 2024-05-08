@@ -1,23 +1,21 @@
 import { ArrowBackIos, Edit, Folder, StarOutlineRounded, StarRounded } from "@mui/icons-material";
 import { Card, CardActions, CardContent, CardHeader, Dialog, IconButton, Slide, SlideProps, Stack, Typography } from "@mui/material";
 import dayjs from "dayjs";
-import { useState } from "react";
-import AddTaskForm from "./AddTaskForm";
 import { Task } from "./Home";
 
 interface TaskDetailsProps {
     activeTask: Task,
     isDetailsViewActive: boolean,
+    onEdit: () => void,
     onClose: () => void,
 }
 
-export default function TaskDetails({ activeTask, isDetailsViewActive, onClose }: TaskDetailsProps) {
-    const [isEditActive, setIsEditActive] = useState(false);
+export default function TaskDetails({ activeTask, isDetailsViewActive, onEdit, onClose }: TaskDetailsProps) {
     const dueDate = dayjs(activeTask.dueDate).format('DD/MM/YY');
     return (
         <>
         <Dialog
-            open={isDetailsViewActive && !isEditActive}
+            open={isDetailsViewActive}
             onClose={() => {
                 onClose();
             }}
@@ -87,16 +85,12 @@ export default function TaskDetails({ activeTask, isDetailsViewActive, onClose }
                     >
                         <ArrowBackIos />
                     </IconButton>
-                    <IconButton onClick={() => {setIsEditActive(true);}} >
+                    <IconButton onClick={() => {onEdit();}} >
                         <Edit />
                     </IconButton>
                 </Stack>
             </CardActions>
         </Dialog>
-        <AddTaskForm 
-            isFormVisible={isEditActive}
-            onCloseForm={() => {setIsEditActive(false);}}
-        />
         </>
     )
 }

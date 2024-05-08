@@ -4,16 +4,17 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from "dayjs";
 import 'dayjs/locale/en-gb';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Task } from "./Home";
 
 interface AddTaskFormProps {
+    defaultTask?: Task
     isFormVisible: boolean,
     onSave: (inputs: Partial<Task>) => void,
     onCloseForm: () => void
 }
 
-export default function AddTaskForm({ isFormVisible, onSave, onCloseForm }: AddTaskFormProps) {
+export default function AddTaskForm({ defaultTask, isFormVisible, onSave, onCloseForm }: AddTaskFormProps) {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [dueDate, setDueDate] = useState<Date|undefined>();
@@ -23,6 +24,14 @@ export default function AddTaskForm({ isFormVisible, onSave, onCloseForm }: AddT
         setDescription('');
         setDueDate(undefined);
     }
+
+    useEffect(() => {
+        if(!defaultTask) return;
+
+        setTitle(defaultTask.title);
+        setDescription(defaultTask.description || '');
+        setDueDate(defaultTask.dueDate);
+    }, [defaultTask])
 
     const isSubmitDisabled = title.length === 0 ;
 
