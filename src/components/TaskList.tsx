@@ -105,6 +105,13 @@ export default function TaskList({ tasksList, onUpdateList, onToggleComplete, on
                 onEdit={() => {
                     setIsEditActive(true);
                 }}
+                onDelete={() => {
+                    if(activeTask) {
+                        onUpdateList(tasksList.filter(({id}) => activeTask?.id !== id));
+                    }
+                    setIsDetailsViewActive(false);
+                    setActiveTaskId(null);
+                }}
                 onClose={() => {
                     setIsDetailsViewActive(false);
                 }}
