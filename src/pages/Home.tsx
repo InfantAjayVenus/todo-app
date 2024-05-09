@@ -10,14 +10,21 @@ import AddTaskForm from "./AddTaskForm";
 import Sections from "./Sections";
 import TaskList from "../components/TaskList";
 import { FiltersProps } from "../components/Filters";
+import { ProjectsProps } from "../components/Projects";
 
 export type Task = {
+    projectId: string,
     id: string,
     title: string,
     description?: string,
     isComplete: boolean,
     isFavourite: boolean,
     dueDate?: Date,
+}
+
+export type Project = {
+    id: string,
+    label: string,
 }
 
 enum FilterType {
@@ -68,6 +75,13 @@ const FilterPresets: Filter[] = [
     }
 ]
 
+const defaultProject: Project[] = [
+    {
+        id: "DEFAULT_PROJECT",
+        label: "Default",
+    }
+]
+
 const defaultTasks = [
     {
         id: '1',
@@ -75,6 +89,7 @@ const defaultTasks = [
         description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Odit quasi neque, iste laborum alias illo repellat temporibus excepturi et quidem.",
         isComplete: false,
         isFavourite: false,
+        projectId: defaultProject[0].id,
     },
     {
         id: '2',
@@ -82,6 +97,7 @@ const defaultTasks = [
         description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Odit quasi neque, iste laborum alias illo repellat temporibus excepturi et quidem.",
         isComplete: false,
         isFavourite: true,
+        projectId: defaultProject[0].id,
     },
     {
         id: '3',
@@ -89,14 +105,31 @@ const defaultTasks = [
         isComplete: true,
         isFavourite: false,
         dueDate: new Date(),
+        projectId: defaultProject[0].id,
     }
 ] as Task[];
 
 export default function Home() {
     const [tasksList, setTasksList] = useState<Task[]>(defaultTasks);
+    const [projectsList, setProjectsList] = useState<Project[]>(defaultProject);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
     const [activeFilterType, setActiveFilterType] = useState(FilterType.ALL);
+    const [activeProjectId, setActiveProjectId] = useState(defaultProject[0].id);
+
+    const projectProps: ProjectsProps = {
+        projectsList,
+        currentProject: projectsList.find(({ id }) => id === activeProjectId) || projectsList[0],
+        addProject: (projectData) => {
+            if (projectData.label?.length === 0) return;
+            const {
+                id = uuid(),
+                label = '',
+            } = projectData;
+            setProjectsList([...projectsList, { id, label } as Project]);
+        },
+        setProject: (project) => setActiveProjectId(project.id),
+    }
 
 
     const filterProps: FiltersProps = {
@@ -105,7 +138,9 @@ export default function Home() {
         setFilter: (filter) => setActiveFilterType(filter.type),
     }
 
-    const filteredTasks = tasksList.filter(filterProps.activeFilter.operation);
+    const filteredTasks = tasksList
+        .filter(({projectId}) => projectId === activeProjectId)
+        .filter(filterProps.activeFilter.operation);
 
     const getCompletedCount = () => filteredTasks.filter(({ isComplete }) => isComplete).length;
 
@@ -127,7 +162,8 @@ export default function Home() {
                 description,
                 isComplete,
                 isFavourite,
-                dueDate
+                dueDate,
+                projectId: activeProjectId,
             } as Task
         ]);
     }
@@ -162,6 +198,7 @@ export default function Home() {
                     >
                         <Sections
                             filterProps={filterProps}
+                            projectProps={projectProps}
                         />
                     </Card>
                     <Card
@@ -277,6 +314,7 @@ export default function Home() {
                 ><Close /></IconButton>
                 <Sections
                     filterProps={filterProps}
+                    projectProps={projectProps}
                 />
             </Dialog>
         </>
