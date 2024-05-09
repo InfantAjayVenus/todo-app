@@ -1,9 +1,13 @@
 import { Button, Stack } from "@mui/material";
-import Filters from "../components/Filters";
+import Filters, { FiltersProps } from "../components/Filters";
 import Projects from "../components/Projects";
 import { Settings } from "@mui/icons-material";
 
-export default function Sections() {
+interface SectionsProps {
+    filterProps: FiltersProps
+}
+
+export default function Sections({ filterProps }: SectionsProps) {
 
     return (
         <Stack
@@ -15,7 +19,7 @@ export default function Sections() {
         >
             <div>
                 <section>
-                    <Filters />
+                    <Filters {...filterProps}/>
                 </section>
                 <section>
                     <Projects />

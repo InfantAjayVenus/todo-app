@@ -1,40 +1,32 @@
-import { DateRange, Inbox, StarRounded, Today } from "@mui/icons-material";
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
+import { Filter } from "../pages/Home";
 
-const FiltersData = [
-    {
-        label: "All",
-        icon: <Inbox />,
-    },
-    {
-        label: "Today",
-        icon: <Today />,
-    },
-    {
-        label: "Favorites",
-        icon: <StarRounded />,
-    },
-    {
-        label: "This Week",
-        icon: <DateRange />,
-    },
-]
+export interface FiltersProps {
+    filtersList: Filter[],
+    activeFilter: Filter,
+    setFilter: (filter: Filter) => void,
+}
 
-export default function Filters() {
+export default function Filters({filtersList, activeFilter, setFilter}: FiltersProps) {
     return (
         <>
             <Typography variant="subtitle1" color={'primary'} fontWeight={'600'} padding={'1rem'}>Filters</Typography>
             <List>
-                {FiltersData.map((filterItem) => (
+                {filtersList.map((filterItem) => {
+                    const isActive = filterItem.type === activeFilter.type;
+                    return (
                     <ListItem key={filterItem.label}>
                         <ListItemButton
                             sx={{
                                 alignItems: 'center',
                                 borderRadius: '0.5rem',
-                                backgroundColor: 'secondary',
+                                backgroundColor: isActive ? 'text.primary' : 'secondary',
                                 '&:hover': {
-                                    background: 'transparent',
+                                    backgroundColor: isActive ? 'text.primary' : 'text.disabled',
                                 }
+                            }}
+                            onClick={() => {
+                                setFilter(filterItem);
                             }}
                         >
                             <ListItemIcon color="text.secondary">{filterItem.icon}</ListItemIcon>
@@ -47,7 +39,8 @@ export default function Filters() {
                             />
                         </ListItemButton>
                     </ListItem>
-                ))}
+                )
+                })}
             </List>
 
         </>

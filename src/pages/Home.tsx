@@ -1,13 +1,15 @@
-import { Close, Menu } from "@mui/icons-material";
+import { Close, DateRange, EventBusyRounded, Inbox, Menu, StarRounded, Today } from "@mui/icons-material";
 import { Button, Card, CardActions, CardContent, CardHeader, Dialog, IconButton, Stack, Typography } from "@mui/material";
 import 'dayjs/locale/en-gb';
 import { useState } from "react";
 import { v4 as uuid } from 'uuid';
+import dayjs from "dayjs";
 
 
 import AddTaskForm from "./AddTaskForm";
 import Sections from "./Sections";
 import TaskList from "../components/TaskList";
+import { FiltersProps } from "../components/Filters";
 
 export type Task = {
     id: string,
@@ -17,6 +19,54 @@ export type Task = {
     isFavourite: boolean,
     dueDate?: Date,
 }
+
+enum FilterType {
+    ALL,
+    TODAY,
+    FAV,
+    WEEK,
+    NO_DUE,
+}
+
+export interface Filter {
+    type: FilterType,
+    label: string,
+    icon: JSX.Element,
+    operation: (task: Task) => boolean
+}
+
+const FilterPresets: Filter[] = [
+    {
+        type: FilterType.ALL,
+        label: "All",
+        icon: <Inbox />,
+        operation: (_: Task) => true
+    },
+    {
+        type: FilterType.TODAY,
+        label: "Today",
+        icon: <Today />,
+        operation: (task: Task) => !!task.dueDate && dayjs(task.dueDate).isSame(new Date(), 'D'),
+    },
+    {
+        type: FilterType.FAV,
+        label: "Favorites",
+        icon: <StarRounded />,
+        operation: (task: Task) => task.isFavourite
+    },
+    {
+        type: FilterType.WEEK,
+        label: "This Week",
+        icon: <DateRange />,
+        operation: (task: Task) => !!task.dueDate && dayjs(task.dueDate).isSame(new Date(), 'week'),
+    },
+    {
+        type: FilterType.NO_DUE,
+        label: "No Due",
+        icon: <EventBusyRounded />,
+        operation: (task: Task) => !task.dueDate,
+    }
+]
 
 const defaultTasks = [
     {
@@ -46,18 +96,27 @@ export default function Home() {
     const [tasksList, setTasksList] = useState<Task[]>(defaultTasks);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-   
+    const [activeFilterType, setActiveFilterType] = useState(FilterType.ALL);
 
-    const getCompletedCount = () => tasksList.filter(({ isComplete }) => isComplete).length;
+
+    const filterProps: FiltersProps = {
+        filtersList: FilterPresets,
+        activeFilter: FilterPresets.find(({ type }) => type === activeFilterType) || FilterPresets[0],
+        setFilter: (filter) => setActiveFilterType(filter.type),
+    }
+
+    const filteredTasks = tasksList.filter(filterProps.activeFilter.operation);
+
+    const getCompletedCount = () => filteredTasks.filter(({ isComplete }) => isComplete).length;
 
     const onAddTask = (inputs: Partial<Task>) => {
         const {
-            id=uuid(),
-            title= '',
-            description='',
-            isComplete=false,
-            isFavourite=false,
-            dueDate=undefined
+            id = uuid(),
+            title = '',
+            description = '',
+            isComplete = false,
+            isFavourite = false,
+            dueDate = undefined
         } = inputs;
 
         setTasksList([
@@ -89,7 +148,7 @@ export default function Home() {
     return (
         <>
             <main>
-                <Stack direction={'row'} spacing={[0,4]}>
+                <Stack direction={'row'} spacing={[0, 4]}>
                     <Card
                         sx={{
                             marginTop: '2rem',
@@ -101,7 +160,9 @@ export default function Home() {
                         }}
                         raised
                     >
-                        <Sections />
+                        <Sections
+                            filterProps={filterProps}
+                        />
                     </Card>
                     <Card
                         sx={{
@@ -121,7 +182,7 @@ export default function Home() {
                                 </Typography>
                             }
                             subheader={
-                                <Typography>{getCompletedCount()}/{tasksList.length}</Typography>
+                                <Typography>{getCompletedCount()}/{filteredTasks.length}</Typography>
                             }
                         />
                         <CardContent
@@ -130,8 +191,8 @@ export default function Home() {
                                 flex: 1
                             }}
                         >
-                            <TaskList 
-                                tasksList={tasksList}
+                            <TaskList
+                                tasksList={filteredTasks}
                                 onUpdateList={(updatedTaskList) => {
                                     setTasksList([...updatedTaskList]);
                                 }}
@@ -214,7 +275,9 @@ export default function Home() {
                         setIsFilterModalOpen(false);
                     }}
                 ><Close /></IconButton>
-                <Sections />
+                <Sections
+                    filterProps={filterProps}
+                />
             </Dialog>
         </>
     )
