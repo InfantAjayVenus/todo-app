@@ -70,7 +70,7 @@ export default function Projects({projectsList, currentProject, setProject, addP
                 {projectsList.map((projectItem, index) => {
                     const isActive = projectItem.id === currentProject.id;
                     return (
-                    <ListItem>
+                    <ListItem key={projectItem.id}>
                         <ListItemButton
                             key={index}
                             sx={{
