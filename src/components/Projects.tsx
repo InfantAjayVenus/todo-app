@@ -22,7 +22,10 @@ export default function Projects() {
                     setIsAddProjectActive(true);
                 }}><Add /></IconButton>
             </Stack>
-            <List>
+            <List sx={{
+                maxHeight: '22vh',
+                overflow: 'auto'
+            }}>
                 <Grow
                     in={isAddProjectActive}
                     mountOnEnter
