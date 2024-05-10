@@ -5,7 +5,7 @@ import { Project } from "../pages/Home";
 
 export interface ProjectsProps {
     projectsList: Project[],
-    currentProject: Project,
+    currentProject?: Project,
     setProject: (project: Project) => void,
     addProject: (projectData: Partial<Project>) => void,
 }
@@ -68,7 +68,7 @@ export default function Projects({projectsList, currentProject, setProject, addP
                     </ListItem>
                 </Grow>
                 {projectsList.map((projectItem, index) => {
-                    const isActive = projectItem.id === currentProject.id;
+                    const isActive = projectItem.id === currentProject?.id;
                     return (
                     <ListItem key={projectItem.id}>
                         <ListItemButton

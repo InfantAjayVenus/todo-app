@@ -115,11 +115,11 @@ export default function Home() {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
     const [activeFilterType, setActiveFilterType] = useState(FilterType.ALL);
-    const [activeProjectId, setActiveProjectId] = useState(defaultProject[0].id);
+    const [activeProjectId, setActiveProjectId] = useState<string|null>(defaultProject[0].id);
 
     const projectProps: ProjectsProps = {
         projectsList,
-        currentProject: projectsList.find(({ id }) => id === activeProjectId) || projectsList[0],
+        currentProject: activeProjectId ? projectsList.find(({ id }) => id === activeProjectId) : undefined,
         addProject: (projectData) => {
             if (projectData.label?.length === 0) return;
             const {
@@ -128,7 +128,14 @@ export default function Home() {
             } = projectData;
             setProjectsList([...projectsList, { id, label } as Project]);
         },
-        setProject: (project) => setActiveProjectId(project.id),
+        setProject: (project) => {
+            if(activeProjectId === project.id) {
+                setActiveProjectId(null);
+                return;
+            }
+
+            setActiveProjectId(project.id);
+        },
     }
 
 
@@ -139,7 +146,7 @@ export default function Home() {
     }
 
     const filteredTasks = tasksList
-        .filter(({projectId}) => projectId === activeProjectId)
+        .filter(({projectId}) => !activeProjectId || (projectId === activeProjectId))
         .filter(filterProps.activeFilter.operation);
 
     const getCompletedCount = () => filteredTasks.filter(({ isComplete }) => isComplete).length;
