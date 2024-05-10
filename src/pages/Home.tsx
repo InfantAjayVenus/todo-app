@@ -45,7 +45,7 @@ export interface Filter {
 const FilterPresets: Filter[] = [
     {
         type: FilterType.ALL,
-        label: "All",
+        label: "All Tasks",
         icon: <Inbox />,
         operation: (_: Task) => true
     },
@@ -222,7 +222,7 @@ export default function Home() {
                         <CardHeader
                             title={
                                 <Typography variant='subtitle1' fontWeight={600}>
-                                    Tasks
+                                    {filterProps.activeFilter.label}
                                 </Typography>
                             }
                             subheader={
