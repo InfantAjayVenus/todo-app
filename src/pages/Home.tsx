@@ -115,7 +115,7 @@ export default function Home() {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
     const [activeFilterType, setActiveFilterType] = useState(FilterType.ALL);
-    const [activeProjectId, setActiveProjectId] = useState<string|null>(defaultProject[0].id);
+    const [activeProjectId, setActiveProjectId] = useState<string|null>(null);
 
     const projectProps: ProjectsProps = {
         projectsList,
