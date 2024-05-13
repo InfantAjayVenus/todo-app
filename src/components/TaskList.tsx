@@ -10,8 +10,8 @@ interface TaskListProps {
     tasksList: Task[],
     projectsList: Project[],
     onUpdateList: (updatedList: Task[]) => void,
-    onToggleComplete: (updateIndex: number) => void,
-    onToggleFavourite: (updateIndex: number) => void,
+    onToggleComplete: (updateIndex: string) => void,
+    onToggleFavourite: (updateIndex: string) => void,
 }
 
 export default function TaskList({ tasksList, projectsList, onUpdateList, onToggleComplete, onToggleFavourite }: TaskListProps) {
@@ -87,7 +87,7 @@ export default function TaskList({ tasksList, projectsList, onUpdateList, onTogg
                                             checkedIcon={<StarRounded />}
                                             checked={taskItem.isFavourite}
                                             onChange={() => {
-                                                onToggleFavourite(index);
+                                                onToggleFavourite(taskItem.id);
                                             }}
                                         />
                                     }
@@ -99,7 +99,7 @@ export default function TaskList({ tasksList, projectsList, onUpdateList, onTogg
                                             checkedIcon={<CheckCircleOutline />}
                                             checked={taskItem.isComplete}
                                             onClick={() => {
-                                                onToggleComplete(index);
+                                                onToggleComplete(taskItem.id);
                                             }}
                                         />
                                     </ListItemIcon>

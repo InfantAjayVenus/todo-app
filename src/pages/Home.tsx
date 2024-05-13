@@ -174,14 +174,18 @@ export default function Home() {
             } as Task
         ]);
     }
-    const onToggleComplete = (updateIndex: number) => {
+    const onToggleComplete = (updateTaskId: string) => {
+        const updateIndex = tasksList.findIndex(({id}) => id === updateTaskId);
+        if(updateIndex < 0) throw(`Task ${updateTaskId} Not Found`)
         const updatedObject = { ...tasksList[updateIndex] };
         updatedObject.isComplete = !updatedObject.isComplete;
         tasksList[updateIndex] = updatedObject;
         setTasksList([...tasksList]);
     }
 
-    const onToggleFavourite = (updateIndex: number) => {
+    const onToggleFavourite = (updateTaskId: string) => {
+        const updateIndex = tasksList.findIndex(({id}) => id === updateTaskId);
+        if(updateIndex < 0) throw(`Task ${updateTaskId} Not Found`)
         const updatedObject = { ...tasksList[updateIndex] };
         updatedObject.isFavourite = !updatedObject.isFavourite;
         tasksList[updateIndex] = updatedObject;
