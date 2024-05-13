@@ -237,6 +237,7 @@ export default function Home() {
                         >
                             <TaskList
                                 tasksList={filteredTasks}
+                                projectsList={projectsList}
                                 onUpdateList={(updatedTaskList) => {
                                     setTasksList([...updatedTaskList]);
                                 }}

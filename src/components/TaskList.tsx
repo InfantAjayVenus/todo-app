@@ -1,26 +1,47 @@
 import { CheckCircleOutline, RadioButtonUnchecked, StarOutlineRounded, StarRounded } from "@mui/icons-material";
-import { Checkbox, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
-import { Task } from "../pages/Home";
+import { Checkbox, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
+import { Project, Task } from "../pages/Home";
 import { useState } from "react";
 import TaskDetails from "../pages/TaskDetails";
 import AddTaskForm from "../pages/AddTaskForm";
+import { SimpleTreeView, TreeItem } from "@mui/x-tree-view";
 
 interface TaskListProps {
     tasksList: Task[],
+    projectsList: Project[],
     onUpdateList: (updatedList: Task[]) => void,
     onToggleComplete: (updateIndex: number) => void,
     onToggleFavourite: (updateIndex: number) => void,
 }
 
-export default function TaskList({ tasksList, onUpdateList, onToggleComplete, onToggleFavourite }: TaskListProps) {
+export default function TaskList({ tasksList, projectsList, onUpdateList, onToggleComplete, onToggleFavourite }: TaskListProps) {
     const [isDetailsViewActive, setIsDetailsViewActive] = useState(false);
     const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
     const [isEditActive, setIsEditActive] = useState(false);
     const activeTask = tasksList.find(({ id }) => id === activeTaskId);
 
+    const tasksGroupedByProjects = Object.entries(tasksList.reduce((acc, taskItem) => {
+        if (!acc[taskItem.projectId]) {
+            acc[taskItem.projectId] = [];
+        }
+
+        acc[taskItem.projectId].push(taskItem);
+        return acc;
+    }, {} as Record<string, Task[]>)).map(
+        ([projectId, list]) => {
+            const project = projectsList.find(({ id }) => projectId === id);
+            if (!project) return;
+
+            return {
+                ...project,
+                tasksList: list,
+            }
+        }
+    ).filter(item => !!item);
+
     const updateTask = (updatedTaskId: string, updatedTaskData: Partial<Task>) => {
-        const updatedTaskIndex = tasksList.findIndex(({id}) => id === updatedTaskId);
-        if(updatedTaskIndex) throw("Task ID does not exist!");
+        const updatedTaskIndex = tasksList.findIndex(({ id }) => id === updatedTaskId);
+        if (updatedTaskIndex) throw ("Task ID does not exist!");
 
         const updatedTaskObject: Task = {
             ...tasksList[updatedTaskIndex],
@@ -33,72 +54,82 @@ export default function TaskList({ tasksList, onUpdateList, onToggleComplete, on
 
     return (
         <>
-            <List
-                sx={{
-                    padding: '0 1rem'
-                }}
-            >
-                {tasksList.map((taskItem, index) => (
-                    <ListItem
-                        key={index}
-                        sx={{
-                            marginBottom: '0.5rem',
-                            borderRadius: '0.5rem',
-                            border: taskItem.isComplete ? 'none' : '1px solid',
-                            borderColor: 'text.secondary',
-                            color: taskItem.isComplete ? 'text.secondary' : 'text.primary',
-                            transition: 'all 0.5s',
-
-                            '&:hover': {
-                                backgroundColor: taskItem.isComplete ? 'transparent' : 'text.primary',
-                            }
-                        }}
-                        secondaryAction={
-                            <Checkbox
-                                edge="end"
-                                icon={<StarOutlineRounded />}
-                                checkedIcon={<StarRounded />}
-                                checked={taskItem.isFavourite}
-                                onChange={() => {
-                                    onToggleFavourite(index);
-                                }}
-                            />
-                        }
-                        disablePadding
+            <SimpleTreeView defaultExpandedItems={tasksGroupedByProjects.map((projectGroup) => projectGroup!.id)}>
+                {tasksGroupedByProjects.map((projectGroup) => (
+                    <TreeItem 
+                        itemId={projectGroup!.id} 
+                        label={<Typography fontWeight={'bold'}>{projectGroup!.label}</Typography>}
                     >
-                        <ListItemIcon sx={{ minWidth: 'fit-content' }}>
-                            <Checkbox
-                                icon={<RadioButtonUnchecked />}
-                                checkedIcon={<CheckCircleOutline />}
-                                checked={taskItem.isComplete}
-                                onClick={() => {
-                                    onToggleComplete(index);
-                                }}
-                            />
-                        </ListItemIcon>
-                        <ListItemButton
+                        <List
                             sx={{
-                                padding: '0 !important',
-                            }}
-                            disableGutters
-                            disableRipple
-                            disableTouchRipple
-                            onClick={() => {
-                                setActiveTaskId(taskItem.id);
-                                setIsDetailsViewActive(true);
+                                padding: '0.5rem 1rem'
                             }}
                         >
-                            <ListItemText
-                                sx={{
-                                    color: 'text.secondary',
-                                    textOverflow: 'ellipsis',
-                                    textDecoration: taskItem.isComplete ? 'line-through' : 'none'
-                                }}
-                            >{taskItem.title}</ListItemText>
-                        </ListItemButton>
-                    </ListItem>
+                            {projectGroup!.tasksList.map((taskItem, index) => (
+                                <ListItem
+                                    key={index}
+                                    sx={{
+                                        marginBottom: '0.5rem',
+                                        borderRadius: '0.5rem',
+                                        border: taskItem.isComplete ? 'none' : '1px solid',
+                                        borderColor: 'text.secondary',
+                                        color: taskItem.isComplete ? 'text.secondary' : 'text.primary',
+                                        transition: 'all 0.5s',
+
+                                        '&:hover': {
+                                            backgroundColor: taskItem.isComplete ? 'transparent' : 'text.primary',
+                                        }
+                                    }}
+                                    secondaryAction={
+                                        <Checkbox
+                                            edge="end"
+                                            icon={<StarOutlineRounded />}
+                                            checkedIcon={<StarRounded />}
+                                            checked={taskItem.isFavourite}
+                                            onChange={() => {
+                                                onToggleFavourite(index);
+                                            }}
+                                        />
+                                    }
+                                    disablePadding
+                                >
+                                    <ListItemIcon sx={{ minWidth: 'fit-content' }}>
+                                        <Checkbox
+                                            icon={<RadioButtonUnchecked />}
+                                            checkedIcon={<CheckCircleOutline />}
+                                            checked={taskItem.isComplete}
+                                            onClick={() => {
+                                                onToggleComplete(index);
+                                            }}
+                                        />
+                                    </ListItemIcon>
+                                    <ListItemButton
+                                        sx={{
+                                            padding: '0 !important',
+                                        }}
+                                        disableGutters
+                                        disableRipple
+                                        disableTouchRipple
+                                        onClick={() => {
+                                            setActiveTaskId(taskItem.id);
+                                            setIsDetailsViewActive(true);
+                                        }}
+                                    >
+                                        <ListItemText
+                                            sx={{
+                                                color: 'text.secondary',
+                                                textOverflow: 'ellipsis',
+                                                textDecoration: taskItem.isComplete ? 'line-through' : 'none'
+                                            }}
+                                        >{taskItem.title}</ListItemText>
+                                    </ListItemButton>
+                                </ListItem>
+                            ))}
+                        </List>
+                    </TreeItem>
                 ))}
-            </List>
+
+            </SimpleTreeView>
             {activeTask && <TaskDetails
                 activeTask={activeTask}
                 isDetailsViewActive={isDetailsViewActive && !isEditActive}
@@ -106,8 +137,8 @@ export default function TaskList({ tasksList, onUpdateList, onToggleComplete, on
                     setIsEditActive(true);
                 }}
                 onDelete={() => {
-                    if(activeTask) {
-                        onUpdateList(tasksList.filter(({id}) => activeTask?.id !== id));
+                    if (activeTask) {
+                        onUpdateList(tasksList.filter(({ id }) => activeTask?.id !== id));
                     }
                     setIsDetailsViewActive(false);
                     setActiveTaskId(null);
@@ -116,7 +147,7 @@ export default function TaskList({ tasksList, onUpdateList, onToggleComplete, on
                     setIsDetailsViewActive(false);
                 }}
             />}
-            <AddTaskForm 
+            <AddTaskForm
                 isFormVisible={isEditActive}
                 defaultTask={activeTask}
                 onCloseForm={() => {
