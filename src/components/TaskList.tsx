@@ -56,8 +56,9 @@ export default function TaskList({ tasksList, projectsList, onUpdateList, onTogg
         <>
             <SimpleTreeView defaultExpandedItems={tasksGroupedByProjects.map((projectGroup) => projectGroup!.id)}>
                 {tasksGroupedByProjects.map((projectGroup) => (
-                    <TreeItem 
-                        itemId={projectGroup!.id} 
+                    <TreeItem
+                        key={projectGroup!.id}
+                        itemId={projectGroup!.id}
                         label={<Typography fontWeight={'bold'}>{projectGroup!.label}</Typography>}
                     >
                         <List
