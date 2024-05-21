@@ -1,7 +1,7 @@
 import { Close, DateRange, EventBusyRounded, Inbox, Menu, StarRounded, Today } from "@mui/icons-material";
 import { Button, Card, CardActions, CardContent, CardHeader, Dialog, IconButton, Stack, Typography } from "@mui/material";
 import 'dayjs/locale/en-gb';
-import { useState } from "react";
+import { useReducer, useState } from "react";
 import { v4 as uuid } from 'uuid';
 import dayjs from "dayjs";
 
@@ -14,6 +14,7 @@ import { ProjectsProps } from "../components/Projects";
 import { Task } from "../types/TaskTypes";
 import { Project } from "../types/ProjectTypes";
 import { Filter, FilterType } from "../types/FilterTypes";
+import { TaskReducerActions, taskReducer } from "../reducers/taskReducer";
 
 const FilterPresets: Filter[] = [
     {
@@ -83,12 +84,12 @@ const defaultTasks = [
 ] as Task[];
 
 export default function Home() {
-    const [tasksList, setTasksList] = useState<Task[]>(defaultTasks);
+    const [tasksList, dispatch] = useReducer(taskReducer, defaultTasks);
     const [projectsList, setProjectsList] = useState<Project[]>(defaultProject);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
     const [activeFilterType, setActiveFilterType] = useState(FilterType.ALL);
-    const [activeProjectId, setActiveProjectId] = useState<string|null>(null);
+    const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
 
     const projectProps: ProjectsProps = {
         projectsList,
@@ -102,7 +103,7 @@ export default function Home() {
             setProjectsList([...projectsList, { id, label } as Project]);
         },
         setProject: (project) => {
-            if(activeProjectId === project.id) {
+            if (activeProjectId === project.id) {
                 setActiveProjectId(null);
                 return;
             }
@@ -119,50 +120,45 @@ export default function Home() {
     }
 
     const filteredTasks = tasksList
-        .filter(({projectId}) => !activeProjectId || (projectId === activeProjectId))
+        .filter(({ projectId }) => !activeProjectId || (projectId === activeProjectId))
         .filter(filterProps.activeFilter.operation);
 
     const getCompletedCount = () => filteredTasks.filter(({ isComplete }) => isComplete).length;
 
     const onAddTask = (inputs: Partial<Task>) => {
-        const {
-            id = uuid(),
-            title = '',
-            description = '',
-            isComplete = false,
-            isFavourite = false,
-            dueDate = undefined
-        } = inputs;
-
-        setTasksList([
-            ...tasksList,
-            {
-                id,
-                title,
-                description,
-                isComplete,
-                isFavourite,
-                dueDate,
-                projectId: activeProjectId,
-            } as Task
-        ]);
+        dispatch({
+            type: TaskReducerActions.ADD_TASK, 
+            payload: {
+                activeProjectId: activeProjectId || defaultProject[0].id,
+                taskData: inputs,
+            }
+        });
     }
     const onToggleComplete = (updateTaskId: string) => {
-        const updateIndex = tasksList.findIndex(({id}) => id === updateTaskId);
-        if(updateIndex < 0) throw(`Task ${updateTaskId} Not Found`)
-        const updatedObject = { ...tasksList[updateIndex] };
-        updatedObject.isComplete = !updatedObject.isComplete;
-        tasksList[updateIndex] = updatedObject;
-        setTasksList([...tasksList]);
+        dispatch({
+            type: TaskReducerActions.TOGGLE_DONE, 
+            payload: {
+                updateTaskId,
+            }
+        });
     }
 
     const onToggleFavourite = (updateTaskId: string) => {
-        const updateIndex = tasksList.findIndex(({id}) => id === updateTaskId);
-        if(updateIndex < 0) throw(`Task ${updateTaskId} Not Found`)
-        const updatedObject = { ...tasksList[updateIndex] };
-        updatedObject.isFavourite = !updatedObject.isFavourite;
-        tasksList[updateIndex] = updatedObject;
-        setTasksList([...tasksList]);
+        dispatch({
+            type: TaskReducerActions.TOGGLE_FAVORITE,
+            payload: {
+                updateTaskId,
+            }
+        })
+    }
+
+    const onUpdateTasks = (updatedTasksList: Task[]) => {
+        dispatch({
+            type: TaskReducerActions.UPDATE_TASK,
+            payload: {
+                updatedTasksList,
+            }
+        })
     }
 
     return (
@@ -215,9 +211,7 @@ export default function Home() {
                             <TaskList
                                 tasksList={filteredTasks}
                                 projectsList={projectsList}
-                                onUpdateList={(updatedTaskList) => {
-                                    setTasksList([...updatedTaskList]);
-                                }}
+                                onUpdateList={onUpdateTasks}
                                 onToggleComplete={onToggleComplete}
                                 onToggleFavourite={onToggleFavourite}
                             />
