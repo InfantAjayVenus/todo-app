@@ -5,7 +5,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from "dayjs";
 import 'dayjs/locale/en-gb';
 import { useEffect, useState } from "react";
-import { Task } from "./Home";
+import { Task } from "../types/TaskTypes";
 
 interface AddTaskFormProps {
     defaultTask?: Task

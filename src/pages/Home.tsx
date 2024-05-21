@@ -11,36 +11,9 @@ import Sections from "./Sections";
 import TaskList from "../components/TaskList";
 import { FiltersProps } from "../components/Filters";
 import { ProjectsProps } from "../components/Projects";
-
-export type Task = {
-    projectId: string,
-    id: string,
-    title: string,
-    description?: string,
-    isComplete: boolean,
-    isFavourite: boolean,
-    dueDate?: Date,
-}
-
-export type Project = {
-    id: string,
-    label: string,
-}
-
-enum FilterType {
-    ALL,
-    TODAY,
-    FAV,
-    WEEK,
-    NO_DUE,
-}
-
-export interface Filter {
-    type: FilterType,
-    label: string,
-    icon: JSX.Element,
-    operation: (task: Task) => boolean
-}
+import { Task } from "../types/TaskTypes";
+import { Project } from "../types/ProjectTypes";
+import { Filter, FilterType } from "../types/FilterTypes";
 
 const FilterPresets: Filter[] = [
     {

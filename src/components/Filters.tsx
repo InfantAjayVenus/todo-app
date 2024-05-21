@@ -1,5 +1,5 @@
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
-import { Filter } from "../pages/Home";
+import { Filter } from "../types/FilterTypes";
 
 export interface FiltersProps {
     filtersList: Filter[],

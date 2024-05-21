@@ -1,7 +1,7 @@
 import { Add, Folder } from "@mui/icons-material";
 import { Grow, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
-import { Project } from "../pages/Home";
+import { Project } from "../types/ProjectTypes";
 
 export interface ProjectsProps {
     projectsList: Project[],

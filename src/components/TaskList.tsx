@@ -1,6 +1,7 @@
 import { CheckCircleOutline, RadioButtonUnchecked, StarOutlineRounded, StarRounded } from "@mui/icons-material";
 import { Checkbox, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
-import { Project, Task } from "../pages/Home";
+import { Project } from "../types/ProjectTypes";
+import { Task } from "../types/TaskTypes";
 import { useState } from "react";
 import TaskDetails from "../pages/TaskDetails";
 import AddTaskForm from "../pages/AddTaskForm";

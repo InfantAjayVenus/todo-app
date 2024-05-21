@@ -1,7 +1,7 @@
 import { ArrowBackIos, DeleteRounded, Edit, Folder, StarOutlineRounded, StarRounded } from "@mui/icons-material";
 import { Card, CardActions, CardContent, CardHeader, Dialog, IconButton, Slide, SlideProps, Stack, Typography } from "@mui/material";
 import dayjs from "dayjs";
-import { Task } from "./Home";
+import { Task } from "../types/TaskTypes";
 
 interface TaskDetailsProps {
     activeTask: Task,
