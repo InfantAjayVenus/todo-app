@@ -23,6 +23,9 @@ const lightTheme = createTheme({
       disabled: 'rgb(196, 205, 209)',
     },
   },
+  typography: {
+    fontFamily: 'lexend',
+  },
 });
 
 const darkTheme = createTheme({
@@ -40,7 +43,10 @@ const darkTheme = createTheme({
       secondary: '#929098',
       disabled: '#717172',
     }
-  }
+  },
+  typography: {
+    fontFamily: 'lexend',
+  },
 })
 
 function App() {
