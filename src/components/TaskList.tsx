@@ -64,7 +64,10 @@ export default function TaskList({ tasksList, projectsList, onUpdateList, onTogg
                     >
                         <List
                             sx={{
-                                padding: '0.5rem 1rem'
+                                padding: '0.5rem 1rem',
+                                maxHeight: '26rem',
+                                overflow: 'auto',
+                                scrollbarWidth: 'thin',
                             }}
                         >
                             {projectGroup!.tasksList.map((taskItem, index) => (
