@@ -70,7 +70,6 @@ export function taskReducer(state: Task[], action: AddTaskAction | ToggleDoneAct
             const updatedObject = { ...state[updateIndex] };
             updatedObject.isComplete = !updatedObject.isComplete;
             state[updateIndex] = updatedObject;
-            console.log('DEBUG:TOGGLE_DONE:', action, updatedObject);
 
             return [...state];
         }
