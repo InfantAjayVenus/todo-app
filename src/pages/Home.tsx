@@ -1,7 +1,7 @@
 import { Close, DateRange, EventBusyRounded, Inbox, Menu, StarRounded, Today } from "@mui/icons-material";
 import { Button, Card, CardActions, CardContent, CardHeader, Dialog, IconButton, Stack, Typography } from "@mui/material";
 import 'dayjs/locale/en-gb';
-import { useReducer, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { v4 as uuid } from 'uuid';
 import dayjs from "dayjs";
 
@@ -15,6 +15,7 @@ import { Task } from "../types/TaskTypes";
 import { Project } from "../types/ProjectTypes";
 import { Filter, FilterType } from "../types/FilterTypes";
 import { TaskReducerActions, taskReducer } from "../reducers/taskReducer";
+import { addTask, getAllTasks } from "../api/tasksApi";
 
 const FilterPresets: Filter[] = [
     {
@@ -91,6 +92,17 @@ export default function Home() {
     const [activeFilterType, setActiveFilterType] = useState(FilterType.ALL);
     const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
 
+    useEffect(() => {
+        (async () => {
+            const result = await getAllTasks();
+            console.log('DEBUG: RESULT:', result);
+            dispatch({type: TaskReducerActions.UPDATE_TASK, payload: {
+                updatedTasksList: result as Task[],
+            }})
+
+        })()
+    }, []);
+
     const projectProps: ProjectsProps = {
         projectsList,
         currentProject: activeProjectId ? projectsList.find(({ id }) => id === activeProjectId) : undefined,
@@ -125,12 +137,13 @@ export default function Home() {
 
     const getCompletedCount = () => filteredTasks.filter(({ isComplete }) => isComplete).length;
 
-    const onAddTask = (inputs: Partial<Task>) => {
+    const onAddTask = async (inputs: Partial<Task>) => {
+        const task = await addTask(inputs);
         dispatch({
             type: TaskReducerActions.ADD_TASK, 
             payload: {
                 activeProjectId: activeProjectId || defaultProject[0].id,
-                taskData: inputs,
+                taskData: task,
             }
         });
     }
