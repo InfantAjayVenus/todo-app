@@ -1,59 +1,170 @@
-import { CheckCircleOutline, Close, Menu, RadioButtonUnchecked, Star, StarOutline } from "@mui/icons-material";
-import { Button, Card, CardActions, CardContent, CardHeader, Checkbox, Dialog, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Typography } from "@mui/material";
+import { Close, DateRange, EventBusyRounded, Inbox, Menu, StarRounded, Today } from "@mui/icons-material";
+import { Button, Card, CardActions, CardContent, CardHeader, Dialog, IconButton, Stack, Typography } from "@mui/material";
 import 'dayjs/locale/en-gb';
-import { useState } from "react";
+import { useReducer, useState } from "react";
+import { v4 as uuid } from 'uuid';
+import dayjs from "dayjs";
+
+
 import AddTaskForm from "./AddTaskForm";
 import Sections from "./Sections";
-import TaskDetails from "./TaskDetails";
+import TaskList from "../components/TaskList";
+import { FiltersProps } from "../components/Filters";
+import { ProjectsProps } from "../components/Projects";
+import { Task } from "../types/TaskTypes";
+import { Project } from "../types/ProjectTypes";
+import { Filter, FilterType } from "../types/FilterTypes";
+import { TaskReducerActions, taskReducer } from "../reducers/taskReducer";
 
-type Task = {
-    title: string,
-    description?: string,
-    isComplete: boolean,
-    isFavourite: boolean,
-    dueDate?: Date,
-}
+const FilterPresets: Filter[] = [
+    {
+        type: FilterType.ALL,
+        label: "All Tasks",
+        icon: <Inbox />,
+        operation: (_: Task) => true
+    },
+    {
+        type: FilterType.TODAY,
+        label: "Today",
+        icon: <Today />,
+        operation: (task: Task) => !!task.dueDate && dayjs(task.dueDate).isSame(new Date(), 'D'),
+    },
+    {
+        type: FilterType.FAV,
+        label: "Favorites",
+        icon: <StarRounded />,
+        operation: (task: Task) => task.isFavourite
+    },
+    {
+        type: FilterType.WEEK,
+        label: "This Week",
+        icon: <DateRange />,
+        operation: (task: Task) => !!task.dueDate && dayjs(task.dueDate).isSame(new Date(), 'week'),
+    },
+    {
+        type: FilterType.NO_DUE,
+        label: "No Due",
+        icon: <EventBusyRounded />,
+        operation: (task: Task) => !task.dueDate,
+    }
+]
+
+const defaultProject: Project[] = [
+    {
+        id: "DEFAULT_PROJECT",
+        label: "Default",
+    }
+]
 
 const defaultTasks = [
     {
+        id: '1',
         title: "A Test Task",
         description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Odit quasi neque, iste laborum alias illo repellat temporibus excepturi et quidem.",
         isComplete: false,
         isFavourite: false,
+        projectId: defaultProject[0].id,
     },
     {
+        id: '2',
         title: "Another Test Task",
         description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Odit quasi neque, iste laborum alias illo repellat temporibus excepturi et quidem.",
         isComplete: false,
         isFavourite: true,
+        projectId: defaultProject[0].id,
     },
     {
+        id: '3',
         title: "A Test Task",
-        isComplete: false,
+        isComplete: true,
         isFavourite: false,
         dueDate: new Date(),
+        projectId: defaultProject[0].id,
     }
 ] as Task[];
 
 export default function Home() {
-    const [tasksList, setTasksList] = useState<Task[]>(defaultTasks);
+    const [tasksList, dispatch] = useReducer(taskReducer, defaultTasks);
+    const [projectsList, setProjectsList] = useState<Project[]>(defaultProject);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-    const [isDetailsViewActive, setIsDetailsViewActive] = useState(false);
+    const [activeFilterType, setActiveFilterType] = useState(FilterType.ALL);
+    const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
 
-    const getCompletedCount = () => tasksList.filter(({ isComplete }) => isComplete).length;
+    const projectProps: ProjectsProps = {
+        projectsList,
+        currentProject: activeProjectId ? projectsList.find(({ id }) => id === activeProjectId) : undefined,
+        addProject: (projectData) => {
+            if (projectData.label?.length === 0) return;
+            const {
+                id = uuid(),
+                label = '',
+            } = projectData;
+            setProjectsList([...projectsList, { id, label } as Project]);
+        },
+        setProject: (project) => {
+            if (activeProjectId === project.id) {
+                setActiveProjectId(null);
+                return;
+            }
 
-    const onToggleComplete = (updateIndex: number) => {
-        const updatedObject = { ...tasksList[updateIndex] };
-        updatedObject.isComplete = !updatedObject.isComplete;
-        tasksList[updateIndex] = updatedObject;
-        setTasksList([...tasksList]);
+            setActiveProjectId(project.id);
+        },
+    }
+
+
+    const filterProps: FiltersProps = {
+        filtersList: FilterPresets,
+        activeFilter: FilterPresets.find(({ type }) => type === activeFilterType) || FilterPresets[0],
+        setFilter: (filter) => setActiveFilterType(filter.type),
+    }
+
+    const filteredTasks = tasksList
+        .filter(({ projectId }) => !activeProjectId || (projectId === activeProjectId))
+        .filter(filterProps.activeFilter.operation);
+
+    const getCompletedCount = () => filteredTasks.filter(({ isComplete }) => isComplete).length;
+
+    const onAddTask = (inputs: Partial<Task>) => {
+        dispatch({
+            type: TaskReducerActions.ADD_TASK, 
+            payload: {
+                activeProjectId: activeProjectId || defaultProject[0].id,
+                taskData: inputs,
+            }
+        });
+    }
+    const onToggleComplete = (updateTaskId: string) => {
+        dispatch({
+            type: TaskReducerActions.TOGGLE_DONE, 
+            payload: {
+                updateTaskId,
+            }
+        });
+    }
+
+    const onToggleFavourite = (updateTaskId: string) => {
+        dispatch({
+            type: TaskReducerActions.TOGGLE_FAVORITE,
+            payload: {
+                updateTaskId,
+            }
+        })
+    }
+
+    const onUpdateTasks = (updatedTasksList: Task[]) => {
+        dispatch({
+            type: TaskReducerActions.UPDATE_TASK,
+            payload: {
+                updatedTasksList,
+            }
+        })
     }
 
     return (
         <>
             <main>
-                <Stack direction={'row'} spacing={[0,4]}>
+                <Stack direction={'row'} spacing={[0, 4]}>
                     <Card
                         sx={{
                             marginTop: '2rem',
@@ -65,7 +176,10 @@ export default function Home() {
                         }}
                         raised
                     >
-                        <Sections />
+                        <Sections
+                            filterProps={filterProps}
+                            projectProps={projectProps}
+                        />
                     </Card>
                     <Card
                         sx={{
@@ -81,11 +195,11 @@ export default function Home() {
                         <CardHeader
                             title={
                                 <Typography variant='subtitle1' fontWeight={600}>
-                                    Tasks
+                                    {filterProps.activeFilter.label}
                                 </Typography>
                             }
                             subheader={
-                                <Typography>{getCompletedCount()}/{tasksList.length}</Typography>
+                                <Typography>{getCompletedCount()}/{filteredTasks.length}</Typography>
                             }
                         />
                         <CardContent
@@ -94,68 +208,13 @@ export default function Home() {
                                 flex: 1
                             }}
                         >
-                            <List
-                                sx={{
-                                    padding: '0 1rem'
-                                }}
-                            >
-                                {tasksList.map((taskItem, index) => (
-                                    <ListItem
-                                        key={index}
-                                        sx={{
-                                            marginBottom: '0.5rem',
-                                            borderRadius: '0.5rem',
-                                            border: taskItem.isComplete ? 'none' : '1px solid',
-                                            borderColor: 'text.secondary',
-                                            color: taskItem.isComplete ? 'text.secondary' : 'text.primary',
-                                            transition: 'all 0.5s',
-
-                                            '&:hover': {
-                                                backgroundColor: taskItem.isComplete ? 'transparent' : 'text.primary',
-                                            }
-                                        }}
-                                        secondaryAction={
-                                            <Checkbox
-                                                edge="end"
-                                                icon={<StarOutline />}
-                                                checkedIcon={<Star />}
-                                                onChange={() => {
-                                                }}
-                                            />
-                                        }
-                                        disablePadding
-                                    >
-                                        <ListItemIcon sx={{ minWidth: 'fit-content' }}>
-                                            <Checkbox
-                                                icon={<RadioButtonUnchecked />}
-                                                checkedIcon={<CheckCircleOutline />}
-                                                onClick={() => {
-                                                    onToggleComplete(index);
-                                                }}
-                                            />
-                                        </ListItemIcon>
-                                        <ListItemButton
-                                            sx={{
-                                                padding: '0 !important',
-                                            }}
-                                            disableGutters
-                                            disableRipple
-                                            disableTouchRipple
-                                            onClick={() => {
-                                                setIsDetailsViewActive(true);
-                                            }}
-                                        >
-                                            <ListItemText
-                                                sx={{
-                                                    color: 'text.secondary',
-                                                    textOverflow: 'ellipsis',
-                                                    textDecoration: taskItem.isComplete ? 'line-through' : 'none'
-                                                }}
-                                            >{taskItem.title}</ListItemText>
-                                        </ListItemButton>
-                                    </ListItem>
-                                ))}
-                            </List>
+                            <TaskList
+                                tasksList={filteredTasks}
+                                projectsList={projectsList}
+                                onUpdateList={onUpdateTasks}
+                                onToggleComplete={onToggleComplete}
+                                onToggleFavourite={onToggleFavourite}
+                            />
                         </CardContent>
                         <CardActions
                             sx={{
@@ -176,15 +235,10 @@ export default function Home() {
                     </Card>
                 </Stack>
                 <AddTaskForm
+                    onSave={onAddTask}
                     isFormVisible={isAddModalOpen}
                     onCloseForm={() => {
                         setIsAddModalOpen(false);
-                    }}
-                />
-                <TaskDetails
-                    isDetailsViewActive={isDetailsViewActive}
-                    onClose={() => {
-                        setIsDetailsViewActive(false);
                     }}
                 />
             </main>
@@ -237,7 +291,10 @@ export default function Home() {
                         setIsFilterModalOpen(false);
                     }}
                 ><Close /></IconButton>
-                <Sections />
+                <Sections
+                    filterProps={filterProps}
+                    projectProps={projectProps}
+                />
             </Dialog>
         </>
     )

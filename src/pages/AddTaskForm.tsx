@@ -2,14 +2,39 @@ import { ArrowBackIos } from "@mui/icons-material";
 import { Button, Card, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Slide, SlideProps, Stack, TextField } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from "dayjs";
 import 'dayjs/locale/en-gb';
+import { useEffect, useState } from "react";
+import { Task } from "../types/TaskTypes";
 
 interface AddTaskFormProps {
+    defaultTask?: Task
     isFormVisible: boolean,
+    onSave: (inputs: Partial<Task>) => void,
     onCloseForm: () => void
 }
 
-export default function AddTaskForm({ isFormVisible, onCloseForm }: AddTaskFormProps) {
+export default function AddTaskForm({ defaultTask, isFormVisible, onSave, onCloseForm }: AddTaskFormProps) {
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
+    const [dueDate, setDueDate] = useState<Date|undefined>();
+
+    const resetStates = () => {
+        setTitle('');
+        setDescription('');
+        setDueDate(undefined);
+    }
+
+    useEffect(() => {
+        if(!defaultTask) return;
+
+        setTitle(defaultTask.title);
+        setDescription(defaultTask.description || '');
+        setDueDate(defaultTask.dueDate);
+    }, [defaultTask])
+
+    const isSubmitDisabled = title.length === 0 ;
+
     return (
         <>
             <Dialog
@@ -46,26 +71,20 @@ export default function AddTaskForm({ isFormVisible, onCloseForm }: AddTaskFormP
                         marginTop: '1rem',
                         padding: '1rem',
                         height: '80vh',
+                        overflow: 'auto',
                     }}
                 >
                     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
                         <Stack
                             spacing={'1rem'}
-                            sx={{
-                                padding: '1rem auto',
-                            }}
+                            paddingY={'1rem'}
                         >
                             <TextField
                                 label="Title"
                                 variant="outlined"
-                                sx={{
-                                    borderRadius: '1rem !important',
-                                }}
-                                inputProps={{
-                                    borderRadius: '1rem',
-                                    sx: {
-                                        borderRadius: '1rem',
-                                    }
+                                value={title}
+                                onChange={(event) => {
+                                    setTitle(event.target.value);
                                 }}
                             />
                             <TextField
@@ -73,13 +92,20 @@ export default function AddTaskForm({ isFormVisible, onCloseForm }: AddTaskFormP
                                 variant="outlined"
                                 multiline
                                 rows={4}
-                                inputProps={{
-                                    sx: {
-                                        borderRadius: '1rem',
-                                    }
+                                value={description}
+                                onChange={(event) => {
+                                    setDescription(event.target.value);
                                 }}
                             />
-                            <DatePicker label="Due Date" />
+                            <DatePicker 
+                                label="Due Date" 
+                                disablePast
+                                displayWeekNumber
+                                value={dueDate ? dayjs(dueDate) : null}
+                                onChange={(date) => {
+                                    setDueDate(date?.toDate());
+                                }}
+                            />
                         </Stack>
                     </LocalizationProvider>
                 </DialogContent>
@@ -97,7 +123,15 @@ export default function AddTaskForm({ isFormVisible, onCloseForm }: AddTaskFormP
                             sx={{
                                 borderRadius: '2rem',
                             }}
+                            disabled={isSubmitDisabled}
                             onClick={() => {
+                                onSave({
+                                    title,
+                                    description,
+                                    dueDate
+                                });
+                                onCloseForm();
+                                resetStates();
                             }}
                         >Save</Button>
                     </Stack>

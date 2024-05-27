@@ -1,15 +1,23 @@
 import { Add, Folder } from "@mui/icons-material";
 import { Grow, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
+import { Project } from "../types/ProjectTypes";
 
-export default function Projects() {
-    const [projectsList, setProjectsList] = useState(["Default"]);
+export interface ProjectsProps {
+    projectsList: Project[],
+    currentProject?: Project,
+    setProject: (project: Project) => void,
+    addProject: (projectData: Partial<Project>) => void,
+}
+
+export default function Projects({projectsList, currentProject, setProject, addProject}: ProjectsProps) {
     const [isAddProjectActive, setIsAddProjectActive] = useState(false);
     const [newProjectName, setNewProjectName] = useState('');
+
     const onAddProject = () => {
         setIsAddProjectActive(false);
         if(newProjectName.length > 0) {
-            setProjectsList([newProjectName, ...projectsList]);
+            addProject({label: newProjectName});
             setNewProjectName('');
         }
     }
@@ -22,7 +30,10 @@ export default function Projects() {
                     setIsAddProjectActive(true);
                 }}><Add /></IconButton>
             </Stack>
-            <List>
+            <List sx={{
+                maxHeight: '22vh',
+                overflow: 'auto'
+            }}>
                 <Grow
                     in={isAddProjectActive}
                     mountOnEnter
@@ -56,21 +67,27 @@ export default function Projects() {
                         </form>
                     </ListItem>
                 </Grow>
-                {projectsList.map((projectName, index) => (
-                    <ListItem>
+                {projectsList.map((projectItem, index) => {
+                    const isActive = projectItem.id === currentProject?.id;
+                    return (
+                    <ListItem key={projectItem.id}>
                         <ListItemButton
                             key={index}
                             sx={{
                                 alignItems: 'center',
                                 borderRadius: '0.5rem',
+                                backgroundColor: isActive ? 'text.primary' : 'secondary',
                                 '&:hover': {
-                                    background: 'transparent',
+                                    backgroundColor: isActive ? 'text.primary' : 'text.disabled',
                                 }
+                            }}
+                            onClick={() => {
+                                setProject(projectItem)
                             }}
                         >
                             <ListItemIcon color="text.secondary"><Folder /></ListItemIcon>
                             <ListItemText
-                                primary={projectName}
+                                primary={projectItem.label}
                                 primaryTypographyProps={{
                                     fontWeight: '600',
                                     color: 'text.secondary',
@@ -78,7 +95,8 @@ export default function Projects() {
                             />
                         </ListItemButton>
                     </ListItem>
-                ))}
+                )
+                })}
             </List>
 
         </>

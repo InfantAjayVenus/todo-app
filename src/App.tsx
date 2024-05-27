@@ -1,7 +1,9 @@
 import { Container, CssBaseline, ThemeProvider, Typography, createTheme } from '@mui/material';
 import Helmet from 'react-helmet';
 import Home from './pages/Home';
-import { useState } from 'react';
+import { createContext, useState } from 'react';
+import { ThemeValue } from './types/Themes';
+import useSystemTheme from './hooks/useSystemTheme';
 
 
 const lightTheme = createTheme({
@@ -49,8 +51,13 @@ const darkTheme = createTheme({
   },
 })
 
+
+export const ThemeValueContext = createContext({themeValue: ThemeValue.SYSTEM, setThemeValue: (_:any) => {} });
+
 function App() {
-  const [isThemeLight, _] = useState(true);
+  const [themeValue, setThemeValue] = useState<ThemeValue>(ThemeValue.SYSTEM);
+  const isSystemThemeLight = useSystemTheme();
+  const isThemeLight = themeValue === ThemeValue.SYSTEM ? isSystemThemeLight : themeValue === ThemeValue.LIGHT;
 
   return (
     <>
@@ -67,7 +74,14 @@ function App() {
           <header>
             <Typography variant='h3' fontWeight={'700'} color='primary.main'>todo.</Typography>
           </header>
-          <Home />
+          <ThemeValueContext.Provider 
+            value={{
+              themeValue,
+              setThemeValue
+            }}
+          >
+            <Home />
+          </ThemeValueContext.Provider>
         </Container>
 
       </ThemeProvider>
