@@ -152,11 +152,21 @@ export default function Home() {
         })
     }
 
-    const onUpdateTasks = (updatedTasksList: Task[]) => {
+    const onUpdateTasks = (updateTaskId: string, updatedTaskData: Partial<Task>) => {
         dispatch({
             type: TaskReducerActions.UPDATE_TASK,
             payload: {
-                updatedTasksList,
+                updateTaskId,
+                updatedTaskData,
+            }
+        })
+    }
+
+    const onDeleteTask = (deleteTaskId: string) => {
+        dispatch({
+            type: TaskReducerActions.DELETE_TASK,
+            payload: {
+                deleteTaskId,
             }
         })
     }
