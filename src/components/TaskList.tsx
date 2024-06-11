@@ -10,12 +10,13 @@ import { SimpleTreeView, TreeItem } from "@mui/x-tree-view";
 interface TaskListProps {
     tasksList: Task[],
     projectsList: Project[],
-    onUpdateList: (updatedList: Task[]) => void,
+    onUpdateList: (updatedTaskId: string, updatedTaskData: Partial<Task>) => void,
     onToggleComplete: (updateIndex: string) => void,
     onToggleFavourite: (updateIndex: string) => void,
+    onDeleteTask: (deleteTaskId: string) => void,
 }
 
-export default function TaskList({ tasksList, projectsList, onUpdateList, onToggleComplete, onToggleFavourite }: TaskListProps) {
+export default function TaskList({ tasksList, projectsList, onUpdateList, onToggleComplete, onToggleFavourite, onDeleteTask }: TaskListProps) {
     const [isDetailsViewActive, setIsDetailsViewActive] = useState(false);
     const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
     const [isEditActive, setIsEditActive] = useState(false);
@@ -41,16 +42,7 @@ export default function TaskList({ tasksList, projectsList, onUpdateList, onTogg
     ).filter(item => !!item);
 
     const updateTask = (updatedTaskId: string, updatedTaskData: Partial<Task>) => {
-        const updatedTaskIndex = tasksList.findIndex(({ id }) => id === updatedTaskId);
-        if (updatedTaskIndex) throw ("Task ID does not exist!");
-
-        const updatedTaskObject: Task = {
-            ...tasksList[updatedTaskIndex],
-            ...updatedTaskData
-        };
-
-        tasksList[updatedTaskIndex] = updatedTaskObject;
-        onUpdateList([...tasksList]);
+        onUpdateList(updatedTaskId, updatedTaskData);
     }
 
     return (
@@ -143,7 +135,7 @@ export default function TaskList({ tasksList, projectsList, onUpdateList, onTogg
                 }}
                 onDelete={() => {
                     if (activeTask) {
-                        onUpdateList(tasksList.filter(({ id }) => activeTask?.id !== id));
+                        onDeleteTask(activeTask);
                     }
                     setIsDetailsViewActive(false);
                     setActiveTaskId(null);

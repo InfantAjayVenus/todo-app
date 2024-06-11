@@ -5,7 +5,8 @@ export enum TaskReducerActions {
     ADD_TASK = "ADD_TASK",
     UPDATE_TASK = "UPDATE_TASK",
     TOGGLE_DONE = "TOGGLE_DONE",
-    TOGGLE_FAVORITE = "TOGGLE_FAVORITE"
+    TOGGLE_FAVORITE = "TOGGLE_FAVORITE",
+    DELETE_TASK = "DELETE_TASK",
 }
 
 type AddTaskAction = {
@@ -33,11 +34,19 @@ type ToggleFavoriteAction = {
 type UpdateTaskAction = {
     type: TaskReducerActions.UPDATE_TASK,
     payload: {
-        updatedTasksList: Task[],
+        updateTaskId: string,
+        updatedTaskData: Partial<Task>,
     }
 }
 
-export function taskReducer(state: Task[], action: AddTaskAction | ToggleDoneAction | ToggleFavoriteAction | UpdateTaskAction) {
+type DeleteTaskAction = {
+    type: TaskReducerActions.DELETE_TASK,
+    payload: {
+        deleteTaskId: string,
+    }
+}
+
+export function taskReducer(state: Task[], action: AddTaskAction | ToggleDoneAction | ToggleFavoriteAction | UpdateTaskAction | DeleteTaskAction) {
     switch (action.type) {
         case TaskReducerActions.ADD_TASK: {
             const { taskData, activeProjectId } = action.payload;
@@ -70,7 +79,6 @@ export function taskReducer(state: Task[], action: AddTaskAction | ToggleDoneAct
             const updatedObject = { ...state[updateIndex] };
             updatedObject.isComplete = !updatedObject.isComplete;
             state[updateIndex] = updatedObject;
-            console.log('DEBUG:TOGGLE_DONE:', action, updatedObject);
 
             return [...state];
         }
@@ -84,8 +92,17 @@ export function taskReducer(state: Task[], action: AddTaskAction | ToggleDoneAct
             return [...state];
         }
         case TaskReducerActions.UPDATE_TASK: {
-            const {updatedTasksList} = action.payload;
-            return [...updatedTasksList];
+            const updateIndex = state.findIndex(({id}) => id === action.payload.updateTaskId);
+            if(updateIndex < 0) return state; 
+            const updatedTask: Task = {
+                ...state[updateIndex],
+
+            }
+            state[updateIndex] = updatedTask;
+            return [...state];
+        }
+        case TaskReducerActions.DELETE_TASK: {
+            return state.filter(({id}) => id !== action.payload.deleteTaskId);
         }
         default:
             return state;
