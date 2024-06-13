@@ -1,9 +1,9 @@
 import { Container, CssBaseline, ThemeProvider, Typography, createTheme } from '@mui/material';
 import Helmet from 'react-helmet';
-import Home from './pages/Home';
 import { createContext, useState } from 'react';
-import { ThemeValue } from './types/Themes';
-import useSystemTheme from './hooks/useSystemTheme';
+import { ThemeValue } from './app/types/Themes';
+import useSystemTheme from './app/hooks/useSystemTheme';
+import Home from './app/pages/Home';
 
 
 const lightTheme = createTheme({

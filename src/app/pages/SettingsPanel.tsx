@@ -2,7 +2,7 @@ import { ArrowBackIos, ComputerOutlined, DarkModeOutlined, LightModeOutlined } f
 import { Card, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Slide, SlideProps, Stack, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { ThemeValue } from "../types/Themes";
 import { useContext } from "react";
-import { ThemeValueContext } from "../App";
+import { ThemeValueContext } from "@/App";
 
 interface SettingsPanelProps {
     isFormVisible: boolean,
